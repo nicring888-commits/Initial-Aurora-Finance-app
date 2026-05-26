@@ -1,0 +1,17 @@
+{
+  "name": "Aurora Finance",
+  "short_name": "Aurora",
+  "description": "A premium personal finance tracker for expenses, income, budgets and trends.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08090b",
+  "theme_color": "#08090b",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

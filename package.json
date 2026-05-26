@@ -1,0 +1,62 @@
+{
+  "name": "aurora-finance-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A premium personal finance tracker built with Electron, React and a deployable Vite web app.",
+  "main": "electron/main.cjs",
+  "author": "Codex",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "dev": "concurrently -k \"vite --host 127.0.0.1 --configLoader native\" \"wait-on tcp:5173 && cross-env ELECTRON_RENDERER_URL=http://127.0.0.1:5173 electron .\"",
+    "dev:web": "vite --host 127.0.0.1 --configLoader native",
+    "dev:renderer": "vite --host 127.0.0.1 --configLoader native",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run build:web",
+    "build:web": "npm run typecheck && vite build --configLoader native",
+    "build:desktop": "npm run build:web && electron-builder",
+    "preview": "vite preview --host 127.0.0.1",
+    "start": "electron .",
+    "dist": "npm run build:desktop"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.24",
+    "lucide-react": "^0.555.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "recharts": "^3.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.6",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.22",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.4",
+    "electron-builder": "^26.0.12",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.3",
+    "wait-on": "^9.0.3"
+  },
+  "build": {
+    "appId": "app.aurora.finance",
+    "productName": "Aurora Finance",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}

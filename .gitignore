@@ -1,0 +1,9 @@
+node_modules
+dist
+release
+.npm-cache
+.electron-cache
+.edge-profile
+.edge-profile-2
+*.log
+*.tsbuildinfo
