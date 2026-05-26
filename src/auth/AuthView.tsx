@@ -47,7 +47,7 @@ export function AuthView({ mode, onModeChange, onAuthenticated }: AuthViewProps)
 
     try {
       if (isRegister) {
-        const result = await signUp(email, password);
+        const result = await signUp(email, password, `${window.location.origin}/dashboard`);
 
         if (result.needsEmailConfirmation) {
           setMessage("Account erstellt. Bitte bestaetige deine E-Mail, bevor du dich anmeldest.");

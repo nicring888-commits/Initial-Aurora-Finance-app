@@ -38,8 +38,6 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
-const authUrl = (path: string) => `${supabaseUrl}/auth/v1${path}`;
-
 const toError = (payload: AuthResponse, fallback: string) =>
   new Error(payload.error_description || payload.message || payload.msg || payload.error || fallback);
 
@@ -86,8 +84,9 @@ const toSession = (payload: AuthResponse): SupabaseSession | null => {
   };
 };
 
-export async function signUpWithEmail(email: string, password: string): Promise<AuthResult> {
-  const payload = await request<AuthResponse>("/signup", {
+export async function signUpWithEmail(email: string, password: string, redirectTo?: string): Promise<AuthResult> {
+  const redirectQuery = redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : "";
+  const payload = await request<AuthResponse>(`/signup${redirectQuery}`, {
     method: "POST",
     body: JSON.stringify({
       email,

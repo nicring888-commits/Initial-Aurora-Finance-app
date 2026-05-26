@@ -22,7 +22,7 @@ interface AuthContextValue {
   user: SupabaseUser | null;
   isConfigured: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<SignUpResult>;
+  signUp: (email: string, password: string, redirectTo?: string) => Promise<SignUpResult>;
   signOut: () => Promise<void>;
 }
 
@@ -53,6 +53,34 @@ const shouldRefresh = (session: SupabaseSession) => {
   return secondsUntilExpiry < 60;
 };
 
+const readSessionFromUrl = (): SupabaseSession | null => {
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const searchParams = new URLSearchParams(window.location.search);
+  const params = hashParams.has("access_token") ? hashParams : searchParams;
+  const accessToken = params.get("access_token");
+  const refreshToken = params.get("refresh_token") ?? undefined;
+  const expiresIn = Number(params.get("expires_in") ?? 0);
+
+  if (!accessToken) {
+    return null;
+  }
+
+  return {
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    expires_at: expiresIn ? Math.floor(Date.now() / 1000) + expiresIn : undefined,
+    user: {
+      id: "",
+      email: params.get("email") ?? undefined
+    }
+  };
+};
+
+const cleanAuthUrl = () => {
+  const cleanPath = window.location.pathname === "/" || window.location.pathname === "/login" ? "/dashboard" : window.location.pathname;
+  window.history.replaceState({}, "", cleanPath);
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>("loading");
   const [session, setSession] = useState<SupabaseSession | null>(null);
@@ -69,6 +97,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async function restoreSession() {
       if (!isSupabaseConfigured) {
         setStatus("unauthenticated");
+        return;
+      }
+
+      const urlSession = readSessionFromUrl();
+
+      if (urlSession) {
+        try {
+          const user = await getAuthenticatedUser(urlSession.access_token);
+
+          if (alive) {
+            applySession({ ...urlSession, user });
+            cleanAuthUrl();
+          }
+        } catch {
+          if (alive) {
+            applySession(null);
+          }
+        }
         return;
       }
 
@@ -110,8 +156,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signUp = useCallback(
-    async (email: string, password: string) => {
-      const result = await signUpWithEmail(email, password);
+    async (email: string, password: string, redirectTo?: string) => {
+      const result = await signUpWithEmail(email, password, redirectTo);
 
       if (result.session) {
         applySession(result.session);
