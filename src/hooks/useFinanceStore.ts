@@ -1,22 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { mockCategories, mockSettings, mockTransactions } from "../data/mockData";
+import { mockCategories, mockSettings } from "../data/mockData";
 import type { Category, FinanceSettings, FinanceState, TransactionDraft } from "../types";
 import { createId } from "../utils/finance";
 
 const STORAGE_KEY = "aurora-finance-state-v1";
 
 const initialState: FinanceState = {
-  transactions: mockTransactions,
+  transactions: [],
   categories: mockCategories,
   settings: mockSettings
 };
 
 const getStorageKey = (userId: string) => `${STORAGE_KEY}:${userId}`;
+const isDemoTransactionId = (id: string) => /^tx-\d{3}$/.test(id);
 
 const readState = (userId: string): FinanceState => {
   try {
     const stored = localStorage.getItem(getStorageKey(userId));
-    return stored ? { ...initialState, ...JSON.parse(stored) } : initialState;
+    const parsed = stored ? ({ ...initialState, ...JSON.parse(stored) } as FinanceState) : initialState;
+    return {
+      ...parsed,
+      transactions: parsed.transactions.filter((transaction) => !isDemoTransactionId(transaction.id))
+    };
   } catch {
     return initialState;
   }
@@ -76,7 +81,7 @@ export function useFinanceStore(userId: string) {
     }));
   }, []);
 
-  const resetDemoData = useCallback(() => {
+  const resetWorkspace = useCallback(() => {
     setState(initialState);
   }, []);
 
@@ -87,8 +92,8 @@ export function useFinanceStore(userId: string) {
       updateSettings,
       updateCategoryBudget,
       addCategory,
-      resetDemoData
+      resetWorkspace
     }),
-    [addCategory, addTransaction, resetDemoData, state, updateCategoryBudget, updateSettings]
+    [addCategory, addTransaction, resetWorkspace, state, updateCategoryBudget, updateSettings]
   );
 }

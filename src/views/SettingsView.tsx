@@ -5,7 +5,7 @@ import { GlassPanel } from "../components/GlassPanel";
 interface SettingsViewProps {
   settings: FinanceSettings;
   onUpdateSettings: (settings: Partial<FinanceSettings>) => void;
-  onResetDemoData: () => void;
+  onResetWorkspace: () => void;
 }
 
 const accents: Array<{ id: FinanceSettings["accent"]; color: string; label: string }> = [
@@ -15,7 +15,7 @@ const accents: Array<{ id: FinanceSettings["accent"]; color: string; label: stri
   { id: "amber", color: "#fbbf24", label: "Amber" }
 ];
 
-export function SettingsView({ settings, onUpdateSettings, onResetDemoData }: SettingsViewProps) {
+export function SettingsView({ settings, onUpdateSettings, onResetWorkspace }: SettingsViewProps) {
   return (
     <div className="grid grid-cols-2 gap-5 max-xl:grid-cols-1">
       <GlassPanel className="p-5">
@@ -92,12 +92,12 @@ export function SettingsView({ settings, onUpdateSettings, onResetDemoData }: Se
             </span>
             <div>
               <h2 className="font-semibold text-ink-100">Lokale Daten</h2>
-              <p className="mt-1 text-sm text-ink-300/58">Transaktionen und Einstellungen bleiben im lokalen App-Speicher.</p>
+              <p className="mt-1 text-sm text-ink-300/58">Transaktionen und Einstellungen bleiben getrennt pro Nutzer im lokalen App-Speicher.</p>
             </div>
           </div>
-          <button className="flex h-10 items-center gap-2 rounded-lg border border-white/[0.08] px-4 text-sm text-ink-200 transition hover:bg-white/[0.06]" onClick={onResetDemoData}>
+          <button className="flex h-10 items-center gap-2 rounded-lg border border-white/[0.08] px-4 text-sm text-ink-200 transition hover:bg-white/[0.06]" onClick={onResetWorkspace}>
             <RotateCcw size={16} />
-            Demo zuruecksetzen
+            Workspace leeren
           </button>
         </div>
       </GlassPanel>

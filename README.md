@@ -10,6 +10,7 @@ Aurora Finance ist ein moderner persoenlicher Ausgaben-Tracker mit React, Vite, 
 - Analytics mit Trend-, Balken- und Donut-Charts
 - Monatsbudgets und Kategorie-Budgets mit Warnstatus
 - Kategorieverwaltung, Settings, Privacy Mode und CSV-Export
+- Leerer Nutzer-Workspace ohne Beispieldaten
 - Lokale Speicherung im Browser/App-Speicher
 - Tastenkombinationen fuer Command Center, neue Transaktion und Export
 
@@ -62,7 +63,7 @@ Die Datei `vercel.json` setzt:
 
 ## Supabase Authentication
 
-Die App nutzt Supabase Authentication fuer Registrierung, Login, Session-Restore und Logout. Die Finanzdaten werden pro Supabase-User-ID getrennt im lokalen Browser-Speicher abgelegt, damit Nutzer nur ihren eigenen Workspace sehen.
+Die App nutzt Supabase Authentication fuer Registrierung, Login, Session-Restore und Logout. Neue Nutzer starten ohne Beispieltransaktionen. Die Finanzdaten werden pro Supabase-User-ID getrennt im lokalen Browser-Speicher abgelegt, damit Nutzer nur ihren eigenen Workspace sehen.
 
 ### Supabase-Projekt anlegen
 

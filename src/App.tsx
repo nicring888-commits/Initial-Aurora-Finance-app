@@ -144,7 +144,7 @@ function AuthenticatedApp({ userId, userEmail, activeView, onNavigate, onSignOut
       case "categories":
         return <CategoriesView categories={store.categories} onAddCategory={store.addCategory} />;
       case "settings":
-        return <SettingsView settings={store.settings} onUpdateSettings={store.updateSettings} onResetDemoData={store.resetDemoData} />;
+        return <SettingsView settings={store.settings} onUpdateSettings={store.updateSettings} onResetWorkspace={store.resetWorkspace} />;
       default:
         return <DashboardView transactions={store.transactions} categories={store.categories} settings={store.settings} />;
     }
