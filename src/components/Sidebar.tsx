@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  LogOut,
   LayoutDashboard,
   ListFilter,
   Settings,
@@ -22,9 +23,11 @@ const navItems: Array<{ id: ViewId; label: string; icon: typeof LayoutDashboard 
 interface SidebarProps {
   activeView: ViewId;
   onNavigate: (view: ViewId) => void;
+  userEmail?: string;
+  onSignOut: () => void;
 }
 
-export function Sidebar({ activeView, onNavigate }: SidebarProps) {
+export function Sidebar({ activeView, onNavigate, userEmail, onSignOut }: SidebarProps) {
   return (
     <aside className="glass-sidebar flex w-[248px] shrink-0 flex-col border-r border-white/[0.07] px-4 py-5 max-lg:w-[92px]">
       <div className="drag-region mb-8 flex h-10 items-center gap-3 px-2">
@@ -65,11 +68,19 @@ export function Sidebar({ activeView, onNavigate }: SidebarProps) {
       <div className="mt-auto rounded-lg border border-white/[0.08] bg-white/[0.04] p-3 max-lg:p-2">
         <div className="flex items-center gap-3 max-lg:justify-center">
           <span className="h-8 w-8 rounded-lg bg-gradient-to-br from-mint via-cyan to-amber" />
-          <div className="max-lg:hidden">
-            <p className="text-xs font-medium text-ink-100">Nicolas</p>
+          <div className="min-w-0 max-lg:hidden">
+            <p className="truncate text-xs font-medium text-ink-100">{userEmail ?? "Account"}</p>
             <p className="text-xs text-ink-300/60">Premium Workspace</p>
           </div>
         </div>
+        <button
+          className="mt-3 flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-white/[0.08] text-xs text-ink-300/70 transition hover:bg-white/[0.06] hover:text-ink-100 max-lg:mt-2"
+          onClick={onSignOut}
+          title="Ausloggen"
+        >
+          <LogOut size={15} />
+          <span className="max-lg:hidden">Ausloggen</span>
+        </button>
       </div>
     </aside>
   );

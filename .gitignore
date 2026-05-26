@@ -7,3 +7,6 @@ release
 .edge-profile-2
 *.log
 *.tsbuildinfo
+.env
+.env.local
+.env.*.local

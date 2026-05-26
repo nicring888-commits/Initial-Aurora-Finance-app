@@ -60,7 +60,43 @@ Die Datei `vercel.json` setzt:
 - SPA-Rewrite: alle Routen laden `index.html`
 - Security- und Cache-Header fuer Production
 
-Es werden aktuell keine Umgebungsvariablen benoetigt, weil die App lokal im Browser speichert und keine externen APIs nutzt.
+## Supabase Authentication
+
+Die App nutzt Supabase Authentication fuer Registrierung, Login, Session-Restore und Logout. Die Finanzdaten werden pro Supabase-User-ID getrennt im lokalen Browser-Speicher abgelegt, damit Nutzer nur ihren eigenen Workspace sehen.
+
+### Supabase-Projekt anlegen
+
+1. Oeffne `https://supabase.com/dashboard`.
+2. Erstelle ein neues Projekt.
+3. Gehe zu `Project Settings` und dann `API`.
+4. Kopiere:
+   - Project URL
+   - anon/public key oder publishable key
+5. Gehe zu `Authentication` und dann `Providers`.
+6. Stelle sicher, dass `Email` aktiviert ist.
+7. Optional: Deaktiviere fuer schnelles Testen die E-Mail-Bestaetigung oder konfiguriere Redirect URLs.
+
+### Lokale ENV-Datei
+
+Erstelle lokal eine Datei `.env.local`:
+
+```bash
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-or-publishable-key
+```
+
+Diese Datei wird nicht committed. Als Vorlage gibt es `.env.example`.
+
+### Vercel Environment Variables
+
+In Vercel unter `Project` -> `Settings` -> `Environment Variables` eintragen:
+
+```text
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+```
+
+Beide Variablen fuer `Production`, `Preview` und `Development` setzen, wenn alle Deployments funktionieren sollen.
 
 ## Deployment mit GitHub und Vercel
 
@@ -98,7 +134,8 @@ git push -u origin main
    - Build Command: `npm run build:web`
    - Output Directory: `dist`
    - Install Command: `ELECTRON_SKIP_BINARY_DOWNLOAD=1 npm ci`
-5. Klicke auf `Deploy`.
+5. Trage unter `Environment Variables` die Supabase-Werte ein.
+6. Klicke auf `Deploy`.
 
 Nach dem ersten Deploy erhaeltst du eine oeffentliche URL nach dem Muster:
 

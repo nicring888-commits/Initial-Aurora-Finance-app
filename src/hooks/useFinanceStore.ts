@@ -11,21 +11,27 @@ const initialState: FinanceState = {
   settings: mockSettings
 };
 
-const readState = (): FinanceState => {
+const getStorageKey = (userId: string) => `${STORAGE_KEY}:${userId}`;
+
+const readState = (userId: string): FinanceState => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(getStorageKey(userId));
     return stored ? { ...initialState, ...JSON.parse(stored) } : initialState;
   } catch {
     return initialState;
   }
 };
 
-export function useFinanceStore() {
-  const [state, setState] = useState<FinanceState>(readState);
+export function useFinanceStore(userId: string) {
+  const [state, setState] = useState<FinanceState>(() => readState(userId));
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state]);
+    setState(readState(userId));
+  }, [userId]);
+
+  useEffect(() => {
+    localStorage.setItem(getStorageKey(userId), JSON.stringify(state));
+  }, [state, userId]);
 
   const addTransaction = useCallback((draft: TransactionDraft) => {
     setState((current) => ({

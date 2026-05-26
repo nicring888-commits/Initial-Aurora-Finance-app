@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { ViewId } from "./types";
+import { useAuth } from "./auth/AuthContext";
+import { AuthView } from "./auth/AuthView";
 import { useFinanceStore } from "./hooks/useFinanceStore";
+import { useRouteView } from "./hooks/useRouteView";
 import { toCsv } from "./utils/finance";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
@@ -22,8 +25,56 @@ const accentColors = {
 };
 
 function App() {
-  const store = useFinanceStore();
-  const [activeView, setActiveView] = useState<ViewId>("dashboard");
+  const auth = useAuth();
+  const route = useRouteView();
+
+  useEffect(() => {
+    const publicPath = route.path === "/login" || route.path === "/register";
+
+    if (auth.status === "authenticated" && (publicPath || route.path === "/")) {
+      route.replace("/dashboard");
+    }
+
+    if (auth.status === "unauthenticated" && !publicPath) {
+      route.replace("/login");
+    }
+  }, [auth.status, route]);
+
+  if (auth.status === "loading") {
+    return <LoadingScreen />;
+  }
+
+  if (auth.status !== "authenticated" || !auth.user) {
+    return (
+      <AuthView
+        mode={route.path === "/register" ? "register" : "login"}
+        onModeChange={(mode) => route.replace(mode === "register" ? "/register" : "/login")}
+        onAuthenticated={() => route.replace("/dashboard")}
+      />
+    );
+  }
+
+  return (
+    <AuthenticatedApp
+      userId={auth.user.id}
+      userEmail={auth.user.email}
+      activeView={route.activeView}
+      onNavigate={route.navigate}
+      onSignOut={auth.signOut}
+    />
+  );
+}
+
+interface AuthenticatedAppProps {
+  userId: string;
+  userEmail?: string;
+  activeView: ViewId;
+  onNavigate: (view: ViewId) => void;
+  onSignOut: () => Promise<void>;
+}
+
+function AuthenticatedApp({ userId, userEmail, activeView, onNavigate, onSignOut }: AuthenticatedAppProps) {
+  const store = useFinanceStore(userId);
   const [transactionModalOpen, setTransactionModalOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
 
@@ -106,7 +157,7 @@ function App() {
     >
       <div className="app-surface absolute inset-0" />
       <div className="relative z-10 flex h-screen">
-        <Sidebar activeView={activeView} onNavigate={setActiveView} />
+        <Sidebar activeView={activeView} onNavigate={onNavigate} userEmail={userEmail} onSignOut={onSignOut} />
         <main className="flex min-w-0 flex-1 flex-col">
           <TopBar activeView={activeView} onOpenAdd={() => setTransactionModalOpen(true)} onOpenCommand={() => setCommandOpen(true)} />
           <section className="min-h-0 flex-1 overflow-y-auto px-7 py-6 max-md:px-4">
@@ -134,10 +185,22 @@ function App() {
       <CommandPalette
         open={commandOpen}
         onClose={() => setCommandOpen(false)}
-        onNavigate={setActiveView}
+        onNavigate={onNavigate}
         onAdd={() => setTransactionModalOpen(true)}
         onExport={exportCsv}
       />
+    </div>
+  );
+}
+
+function LoadingScreen() {
+  return (
+    <div className="relative grid h-screen place-items-center overflow-hidden bg-ink-950 text-ink-100">
+      <div className="app-surface absolute inset-0" />
+      <div className="relative z-10 text-center">
+        <div className="mx-auto mb-4 h-10 w-10 animate-pulse rounded-lg bg-white" />
+        <p className="text-sm text-ink-300/65">Session wird geladen</p>
+      </div>
     </div>
   );
 }
